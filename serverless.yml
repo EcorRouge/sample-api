@@ -1,0 +1,191 @@
+# This service is an identical set of all endpoints that are to be deployed to the cloud
+# this is used to test and develop APIs locally
+service: SP-API
+custom:
+  corsStatements:
+    origin: '*' # <-- Specify allowed origin. If required, allowed origin can be set to point from webapp deployment URL.
+    headers: # <-- Specify allowed headers
+      - Content-Type
+      - X-Amz-Date
+      - Authorization
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - X-Supplier-Id
+      - Access-Control-Allow-Headers
+      - Access-Control-Allow-Origin
+    allowCredentials: false
+  pythonRequirements:
+    dockerizePip: true
+  splitStacks:
+    perFunction: true
+  scripts:
+    commands:
+      localize: sh dynamodb_local_scripts/initialize_dynamodb_local.sh
+      delocalize: sh dynamodb_local_scripts/stop_dynamodb_local.sh
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: false
+      seed: false
+      convertEmptyValues: false
+
+provider:
+  name: aws
+  runtime: python3.6
+  iamRoleStatements: # permissions for all of your functions can be set here
+  - Effect: Allow
+    Action: # Gives permission to DynamoDB tables in a specific region
+    - dynamodb:DescribeTable
+    - dynamodb:Query
+    - dynamodb:Scan
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:*:*:*"
+
+  stage: ${opt:stage, 'local'}
+  region: ${file(./config.${self:provider.stage}.json):REGION}
+  environment:
+    REGION: ${file(./config.${self:provider.stage}.json):REGION}
+    AUTH0_DOMAIN: ${file(./config.${self:provider.stage}.json):AUTH0_DOMAIN}
+    AUTH0_AUDIENCE: ${file(./config.${self:provider.stage}.json):AUTH0_AUDIENCE}
+    AUTH0_CLIENT_ID: ${file(./config.${self:provider.stage}.json):AUTH0_CLIENT_ID}
+    AUTH0_CLIENT_SECRET: ${file(./config.${self:provider.stage}.json):AUTH0_CLIENT_SECRET}
+    AUTH0_MANAGEMENT_API_CLIENT_ID: ${file(./config.${self:provider.stage}.json):AUTH0_MANAGEMENT_API_CLIENT_ID}
+    AUTH0_MANAGEMENT_API_CLIENT_SECRET: ${file(./config.${self:provider.stage}.json):AUTH0_MANAGEMENT_API_CLIENT_SECRET}
+    SIGNUP_ORIGIN_URL: ${file(./config.${self:provider.stage}.json):SIGNUP_ORIGIN_URL}
+    AUTH0_CLIENT_PUBLIC_KEY: ${file(./public_key.${self:provider.stage})}
+    AUTH0_CONNECTION: ${file(./config.${self:provider.stage}.json):AUTH0_CONNECTION}
+    STRIPE_SECRET_KEY: ${file(./config.${self:provider.stage}.json):STRIPE_SECRET_KEY}
+    EMAIL_TRANSMITTER_SOURCE: ${file(./config.${self:provider.stage}.json):EMAIL_TRANSMITTER_SOURCE}
+    S3_UPLOADS_BUCKET_NAME: ${file(./config.${self:provider.stage}.json):S3_UPLOADS_BUCKET_NAME}
+
+
+plugins:
+  - serverless-offline-python
+  - serverless-python-requirements
+  - serverless-plugin-scripts
+  - serverless-pseudo-parameters
+  - serverless-prune-plugin
+
+functions:
+  auth:
+    handler: handler.auth
+    cors: true
+    runtime: nodejs10.x
+
+  login:
+    handler: services/user/handler.login
+    name: ${self:provider.stage}-login
+    description: Handle login request
+    timeout: 20
+    events:
+      - http:
+          path: login
+          method: post
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+
+  signup:
+    handler: services/user/handler.signup
+    name: ${self:provider.stage}-signup
+    description: Handle signup request
+    timeout: 20
+    events:
+      - http:
+          path: signup
+          method: post
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+
+  password_reset:
+    handler: services/user/handler.password_reset
+    name: ${self:provider.stage}-password-reset
+    description: Handle user password reset request
+    timeout: 20
+    events:
+      - http:
+          path: password-reset
+          method: post
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+
+  get_or_create_profile:
+    handler: services/profile/handler.get_or_create_profile
+    name: ${self:provider.stage}-get-profile
+    description: Handle GET request for user profile
+    timeout: 20
+    events:
+      - http:
+          path: users
+          method: get
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+          authorizer:   # REF: https://forum.serverless.com/t/rest-api-with-custom-authorizer-how-are-you-dealing-with-authorization-and-policy-cache/3310
+            name: auth
+            resultTtlInSeconds: 300
+            identityValidationExpression: '^Bearer [-0-9a-zA-z\.]*$'
+
+  update_profile:
+    handler: services/profile/handler.update_profile
+    name: ${self:provider.stage}-update-profile
+    description: Handle PUT request for user profile
+    timeout: 20
+    events:
+      - http:
+          path: users
+          method: put
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+          authorizer:   # REF: https://forum.serverless.com/t/rest-api-with-custom-authorizer-how-are-you-dealing-with-authorization-and-policy-cache/3310
+            name: auth
+            resultTtlInSeconds: 300
+            identityValidationExpression: '^Bearer [-0-9a-zA-z\.]*$'
+
+  delete_profile:
+    handler: services/profile/handler.delete_account
+    name: ${self:provider.stage}-delete-account
+    description: Handles DELETE user account
+    timeout: 20
+    events:
+      - http:
+          path: users
+          method: delete
+          cors: true
+          response:
+            headers:
+              Content-Type: "'application/json'"
+            template: $input.path('$.body')
+          integration: lambda
+          authorizer:   # REF: https://forum.serverless.com/t/rest-api-with-custom-authorizer-how-are-you-dealing-with-authorization-and-policy-cache/3310
+            name: auth
+            resultTtlInSeconds: 300
+            identityValidationExpression: '^Bearer [-0-9a-zA-z\.]*$'

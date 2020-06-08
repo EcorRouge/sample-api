@@ -1,0 +1,15 @@
+{
+  "REGION": "us-east-1",
+  "AUTH0_CLIENT_ID": "t7ioNGXfauCE8hSt3951NnRQVFzxxxxx",
+  "AUTH0_CLIENT_SECRET": "1SAMwF78qEpt9dyEWP9aP28A6TvmuWdsdxrALBXSto608DOw6NmX6HSZUOxxxx",
+  "AUTH0_MANAGEMENT_API_CLIENT_ID": "I4NC4YD8I2HRb8rxL9NSaSZ6umqgxxxx",
+  "AUTH0_MANAGEMENT_API_CLIENT_SECRET": "c7OB8U6rUoDVQ6X3nUNKp6wzekAuTk1llCzTXkHqodMRr7XZRGRqj0muHwnCxxxx",
+  "AUTH0_AUDIENCE": "https://neotheicebird.auth0.com/api/v2/",
+  "AUTH0_DOMAIN": "https://neotheicebird.auth0.com",
+  "AUTH0_CONNECTION": "Username-Password-Authentication",
+  "S3_UPLOADS_BUCKET_NAME": "sample-project-xxxxxx",
+  "SIGNUP_ORIGIN_URL": "*",
+  "ROLLBAR_SECRET": "7e87a2dcd94646818928277ac4700000",
+  "EMAIL_TRANSMITTER_SOURCE": "project@email.com",
+  "WEBAPP_BASE_URL": "http://localhost:8080"
+}

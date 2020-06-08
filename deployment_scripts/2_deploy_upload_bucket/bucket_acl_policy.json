@@ -1,0 +1,22 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+    {
+      "Sid": "PublicReadForGetBucketObjects",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::$S3_UPLOADS_BUCKET_NAME/profile_pictures/*",
+      "Principal": "*"
+    },{
+      "Sid": "PublicReadForGetBucketObjects",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::$S3_UPLOADS_BUCKET_NAME/static/*",
+      "Principal": "*"
+    }
+  ]
+}

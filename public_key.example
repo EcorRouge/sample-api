@@ -1,0 +1,4 @@
+-----BEGIN CERTIFICATE-----
+Copy the Signing Certificate contents for Auth0 Application > Settings > Advanced Settings > Certificates
+and paste it in a file named `public_key` in the parent directory of the project.
+-----END CERTIFICATE-----

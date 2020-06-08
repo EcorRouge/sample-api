@@ -1,0 +1,13 @@
+{
+  "REGION": "{ region }",
+  "AUTH0_CLIENT_ID": "{ auth0_client_id }",
+  "AUTH0_CLIENT_SECRET": "{ auth0_client_secret }",
+  "AUTH0_MANAGEMENT_API_CLIENT_ID": "{ auth0_management_api_client_id }",
+  "AUTH0_MANAGEMENT_API_CLIENT_SECRET": "{ auth0_management_api_client_secret }",
+  "AUTH0_AUDIENCE": "{ auth0_audience }",
+  "AUTH0_DOMAIN": "{ auth0_domain }",
+  "AUTH0_CONNECTION": "Username-Password-Authentication",
+  "S3_UPLOADS_BUCKET_NAME": "{ s3_bucket }",
+  "SIGNUP_ORIGIN_URL": "*",
+  "ROLLBAR_SECRET": "{ rollbar_serverside_secret }"
+}

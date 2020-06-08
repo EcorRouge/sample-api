@@ -1,0 +1,603 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# SampleProject
+
+This set of APIs allow users to access SampleProject resources like User Profile, Suppliers, Distributors etc.
+
+Private endpoints are guarded by authorizers. To get Authorized, users need to pass a `Bearer` type `Authorization` Header, with `ID-TOKEN` received from login endpoint.
+Many of the endpoints also require a `x-supplier-id` header.
+
+## Login [/login]
+
+This is a public endpoint that is used to login users to Prolance. It provides a way to get the `id_token` required to access private resources.
+
+### Login [POST]
+
+Login user
+
++ Request (application/json)
+
+    + Body
+
+            {
+              "username": "john.doe@email.com",
+              "password": "SuperSecret123!"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IlFrSXpSVFkxTlRjMk1ESkVRVFJEUkRFeFF6RTBOekl3T1RnMlF6RkZNalExUWpNMlJFWXdNdyJ9.eyJpc3MiOiJodHRwczovL25lb3RoZWljZWJpcmQuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVjZjNiY2Q2NDQwMDhiMGU3ZTJiOWM3MiIsImF1ZCI6WyJodHRwczovL25lb3RoZWljZWJpcmQuYXV0aDAuY29tL2FwaS92Mi8iLCJodHRwczovL25lb3RoZWljZWJpcmQuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTU1OTQ3ODE2NiwiZXhwIjoxNTU5NTY0NTY2LCJhenAiOiI1MHQxeTZKYUpnY3dNbHhVaVdoRGN2NzBRS2t1WFFrcCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgYWRkcmVzcyBwaG9uZSByZWFkOmN1cnJlbnRfdXNlciB1cGRhdGU6Y3VycmVudF91c2VyX21ldGFkYXRhIGRlbGV0ZTpjdXJyZW50X3VzZXJfbWV0YWRhdGEgY3JlYXRlOmN1cnJlbnRfdXNlcl9tZXRhZGF0YSBjcmVhdGU6Y3VycmVudF91c2VyX2RldmljZV9jcmVkZW50aWFscyBkZWxldGU6Y3VycmVudF91c2VyX2RldmljZV9jcmVkZW50aWFscyB1cGRhdGU6Y3VycmVudF91c2VyX2lkZW50aXRpZXMiLCJndHkiOiJwYXNzd29yZCJ9.tNRppTk19rNEndb4-RDfboe5_DrvB1JJfgie_K869hBPmVRsnO0nslItjF9ol6GY7UmbMxQRm9k7eNqQpWxkBdYt6cceFMrfcCJmOzxwNiK6zv3pPIX5BQgpUJIa0UwTMSvxYwzuOhs_MTPmfL0ndw4CgPS7V0ypI2MXkJTBPCGdcBidSQtQzE3UenVoE7azDKhg9Vk9pAI_b7SGJAkrP1duv4OkRXi4ptZJSvXRFYy3GfT1lRk77_-h_S7qzI-IHrCjtkQjmO1MHTW5FROy_rd5jDGE21if40F7WdpP9p-bomwaVIbntEbOSznlYw5DuLfC7nHpNWpb5fG0t8LizA",
+            "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IlFrSXpSVFkxTlRjMk1ESkVRVFJEUkRFeFF6RTBOekl3T1RnMlF6RkZNalExUWpNMlJFWXdNdyJ9.eyJuaWNrbmFtZSI6Ink0ODU2MjEiLCJuYW1lIjoieTQ4NTYyMUBud3l0Zy5uZXQiLCJwaWN0dXJlIjoiaHR0cHM6Ly9zLmdyYXZhdGFyLmNvbS9hdmF0YXIvZDE0ODI5ZTEwZjhlODExZDE0ZWZiZDQ3ODRjOGQwODg_cz00ODAmcj1wZyZkPWh0dHBzJTNBJTJGJTJGY2RuLmF1dGgwLmNvbSUyRmF2YXRhcnMlMkZ5NC5wbmciLCJ1cGRhdGVkX2F0IjoiMjAxOS0wNi0wMlQxMjoyMjo0Ni4zOThaIiwiZW1haWwiOiJ5NDg1NjIxQG53eXRnLm5ldCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL25lb3RoZWljZWJpcmQuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVjZjNiY2Q2NDQwMDhiMGU3ZTJiOWM3MiIsImF1ZCI6IjUwdDF5NkphSmdjd01seFVpV2hEY3Y3MFFLa3VYUWtwIiwiaWF0IjoxNTU5NDc4MTY2LCJleHAiOjE1NTk1MTQxNjZ9.gqH6LpGz9WyoDRVLyPElfZGshp868kdaiA0QSr6AsDZcPuK4sxnKZUg4N8m53rOQKnRbw7Wmlps4uTi3LPwrfo0z3k6AKzd4CGLKbiJV4_-vbYwTSxY6bdvwt-MuM6cCgGbknS9LxcZo-bu-LBhpxNt2Bdiatg021s4hNA1CILp9Z2gbJOmnjiKEqaildYWxGzXZWCK99PPo3829xlEGGEqclGC3Bif9P1LaxcYLSLll20zJZBMOXhX-t_9IzolR5l4Q5bUqAkz59bHRBWeAHmnS1d2rDmRaVTD2L0wx_cKb7yxvPLL4J0v0cyLLw0p9H43feb4y-C456Fu4951m4A",
+            "scope": "openid profile email address phone read:current_user update:current_user_metadata delete:current_user_metadata create:current_user_metadata create:current_user_device_credentials delete:current_user_device_credentials update:current_user_identities",
+            "expires_in": 86400,
+            "token_type": "Bearer"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 500 (application/json)
+
+        {
+            "error": "Unknown error happened"
+        }
+
+
+
+## Password Reset [/password-reset]
+
+This is a public endpoint that is used to reset users' password.
+
+### Reset [POST]
+
+Reset's user password
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "email": "johnsmith@example.com"
+            }
+
++ Response 204
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "{Error message from Auth0}"
+        }
+
++ Response 500 (application/json)
+
+        {
+            "error": "Unknown error happened"
+        }
+
+## Profile [/user]
+
+This resource contains user information like Name, Email ID and the marketplaces where the user works.
+
+### Get or Create [GET]
+
+Gets the user profile if exists, else creates a new user profile.
+
+When a new profile is created, the response is simple as the first response below. Upon doing an update, a more detailed response can be gotten as in the second response.
+
++ Response 200 (application/json)
+
+        {
+            "user_id": "5cf84fff8506530c5c820961",
+            "email": "johnsmith@gmail.com"
+            "affiliate_id": "2CVHTX",
+            "entity_id": "5cf84fff8506530c5c820961",
+            "version": "07751555-6182-4aea-8e34-18dd5f5664cc",
+            "changed_on": "2019-06-05T23:41:06Z"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "affiliate_id": "2CVHTX",
+            "email": "johnsmith@gmail.com",
+            "lastname": "User",
+            "user_id": "5cf84fff8506530c5c820961",
+            "firstname": "Test",
+            "entity_id": "5cf84fff8506530c5c820961",
+            "version": "abb0e3a9-206f-477e-b132-efc0f7e8e4e8",
+            "changed_on": "2019-06-05T23:43:53Z"
+        }
+
+### Update [PUT]
+
+Updates the user profile
+
+For example let us update the name.
+
+Note: This method does not allow updating base attributes of the resource, this will lead to a `409` error.
+Base attributes include `entity_id`, `version`, `changed_by_id`, `changed_on`. Also `affiliate_id`, `user_id` cannot be updated.
+
+The marketplace object attribute `last_reviewed` is set server-side and cannot be updated. If `last_reviewed` is passed in request, it will be ignored.
+
+Also you can optionally, in your request, omit key pairs that are not changed with respect to current value.
+
++ Request (application/json)
+
+        {
+            "entity_id": "5cf84fff8506530c5c820961",
+            "version": "abb0e3a9-206f-477e-b132-efc0f7e8e4e8",
+            "user_id": "5cf84fff8506530c5c820961",
+            "changed_on": "2018-08-05T08:40:51.620Z",
+            "firstname": "John",
+            "lastname": "Smith",
+            "email": "johnsmith@gmail.com"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "entity_id": "5cf84fff8506530c5c820961",
+            "version": "b4072e58-a561-46cb-9132-98650d7326d6",
+            "changed_by_id": "5cf84fff8506530c5c820961",
+            "user_id": "5cf84fff8506530c5c820961",
+            "changed_on": "2018-08-05T08:40:51.620Z",
+            "firstname": "John",
+            "lastname": "Smith",
+            "email": "johnsmith@gmail.com",
+            "affiliate_id": "27DX7H"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 409 (application/json)
+
+        {
+            "error": "The request could not be completed due to a conflict with the current state of the resource"
+        }
+
+### Delete profile [DELETE]
+
+To Delete a profile is the same as deleting an user account. User's profile along with their Authentication and authorization permissions are deleted.
+
++ Response 204
+
+## Suppliers [/supplier]
+
+This resource contains information on suppliers.
+
+### Get all [GET]
+
+Get all suppliers
+
++ Request
+    + Headers
+
+            Authorization: Bearer ABCDEF
+
++ Response 200 (application/json)
+
+        [
+            {
+                "website": "www.spirits.com",
+                "zip": "600001",
+                "name": "United Spirits",
+                "state": "karnataka",
+                "city": "banglore",
+                "main_contact_id": "ad51d5ac-17bb-4240-8648-c483b224b2aa",
+                "user_id": "5d081df871deea0dd14ce63a",
+                "street1": "MG Road",
+                "street2": "india",
+                "has_logo": true,
+                "users": [],
+                "phone": "1234567890",
+                "entity_id": "5c516c03-2bb8-434b-9041-171eda2c5196",
+                "version": "5c460f80-bc34-4931-9378-668e78757a22",
+                "changed_on": "2019-06-20T03:04:06Z"
+            }
+        ]
+
+### Add [POST]
+
+Adds a new supplier
+
+Please note, the property "main_contact_id" is automatically set to the user's user_id. If you would
+like to set a different "main_contact_id", you can use the Update endpoint.
+
+"users" list property cannot be updated through this endpoint. Its set automatically.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer ABCDEF
+
+    + Body
+
+            {
+                "name": "United Spirits",
+                "street1": "MG Road",
+                "street2": "india",
+                "city": "banglore",
+                "state": "karnataka",
+                "zip": "600001",
+                "phone": "1234567890",
+                "website": "www.spirits.com",
+                "has_logo": true,
+                "logo": "iVBORw0KGgoAAAANSUhEUgAACfkAAAMiCAYAAADXE1tkAAftqElEQVR42uz9abAk2Xn=="
+            }
+
++ Response 200 (application/json)
+
+        {
+            "name": "United Spirits",
+            "street1": "MG Road",
+            "street2": "india",
+            "city": "banglore",
+            "state": "karnataka",
+            "zip": "600001",
+            "phone": "1234567890",
+            "website": "www.spirits.com",
+            "has_logo": true,
+            "main_contact_id": "5d081df871deea0dd14ce63a",
+            "users": [
+                {
+                    "user_id": "5d081df871deea0dd14ce63a",
+                    "user_name": "Adam",
+                    "role": "admin"
+                }
+            ],
+            "user_id": "5d081df871deea0dd14ce63a",
+            "entity_id": "53142b41-0963-4463-b793-68796f5bc130",
+            "version": "2e9498f5-a1a3-478a-a55e-c250c4bce318",
+            "changed_on": "2019-06-20T02:55:04Z"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 409 (application/json)
+
+        {
+            "error": "The request could not be completed due to a conflict with the current state of the resource"
+        }
++ Response 415 (application/json)
+
+        {
+            "error": "Unsupported media type. Error with logo PNG. Unable to decode base64-PNG"
+        }
+
+### Update [PUT]
+
+Update an existing supplier
+
+"users" list property cannot be updated through this endpoint. Its set automatically.
+
+The ideal way to update is to GET a supplier, modify the key-value pairs in that JSON data and
+pass it as body in a request to this endpoint
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 53142b41-0963-4463-b793-68796f5bc130
+
+    + Body
+
+            {
+                "name": "United Spirits",
+                "street1": "MG Road",
+                "street2": "india",
+                "city": "banglore",
+                "state": "karnataka",
+                "zip": "600021",
+                "phone": "9876543210",
+                "website": "www.spirits.com",
+                "has_logo": true,
+                "logo": "iVBORw0KGgoAAAANSUhEUgAACfkAAAMiCAYAAADXE1tkAAftqElEQVR42uz9abAk2Xn==",
+                "main_contact_id": "ad51d5ac-17bb-4240-8648-c483b224b2aa",
+                "users": [
+                    {
+                        "user_id": "5d081df871deea0dd14ce63a",
+                        "user_name": "Adam",
+                        "role": "admin"
+                    }
+                ],
+                "user_id": "5d081df871deea0dd14ce63a",
+                "entity_id": "53142b41-0963-4463-b793-68796f5bc130",
+                "version": "2e9498f5-a1a3-478a-a55e-c250c4bce318",
+                "changed_on": "2019-06-20T02:55:04Z"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "name": "United Spirits",
+            "street1": "MG Road",
+            "street2": "india",
+            "city": "banglore",
+            "state": "karnataka",
+            "zip": "600021",
+            "phone": "9876543210",
+            "website": "www.spirits.com",
+            "has_logo": true,
+            "main_contact_id": "ad51d5ac-17bb-4240-8648-c483b224b2aa",
+            "users": [
+                {
+                    "user_id": "5d081df871deea0dd14ce63a",
+                    "user_name": "Adam",
+                    "role": "admin"
+                }
+            ],
+            "user_id": "5d081df871deea0dd14ce63a",
+            "entity_id": "53142b41-0963-4463-b793-68796f5bc130",
+            "version": "15a26957-a158-466c-9b6b-f1b8ff63da83",
+            "changed_on": "2019-06-20T02:55:29Z"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. Missing required key-val pair {KEY}"
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "Resource not found"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. Unknown Main Contact"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. Not an admin user"
+        }
+
++ Response 409 (application/json)
+
+        {
+            "error": "The request could not be completed due to a conflict with the current state of the resource"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
++ Response 415 (application/json)
+
+        {
+            "error": "Unsupported media type. Error with logo PNG. Unable to decode base64-PNG"
+        }
+
+## Suppliers - Manage users under supplier [/supplier/user]
+
+### Get all users [GET]
+
+Get all users associated with a supplier
+
++ Request
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 53142b41-0963-4463-b793-68796f5bc130
+
++ Response 200 (application/json)
+
+        [
+            {
+                "email": "szi63337@bcaoo.com",
+                "name": "John",
+                "role": "admin",
+                "user_id": "5d26d828fe86a90c7c8c0a64"
+            },
+            {
+                "email": "glw75630@bcaoo.com",
+                "name": "Jim",
+                "role": "admin",
+                "user_id": "5d45eb167d59560e83000b6c"
+            }
+        ]
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. Admins only"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "Supplier not found"
+        }
+
+### Add or Update User [POST]
+
+Adds or Updates a new or existing user to a supplier.
+Please note: The `user_id` returned is the user_id of the user added to the supplier.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 53142b41-0963-4463-b793-68796f5bc130
+
+    + Body
+
+            {
+                "email": "szi63337@bcaoo.com",
+                "name": "John Smith",
+                "role": "user"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "name": "John Smith",
+            "role": "user",
+            "user_id": "5d081df871deea0dd14ce63a"
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "Bad request. The request was malformed"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. Admins only"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
+
+## Suppliers - Remove user [/supplier/user/{user_id}]
+
+### Remove User [DELETE]
+
+Deletes a user from a supplier by their user_id. The current user should be an admin for the supplier to successfully carry out this delete.
+
++ Parameters
+    + `user_id` (string) - `5d081df871deea0dd14ce63a` user_id of the user in the supplier's list of users
+
++ Request
+
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 5c516c03-2bb8-434b-9041-171eda2c5196
+
++ Response 204
+
++ Response 404 (application/json)
+
+        {
+            "error": "Resource not found"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. Admins only"
+        }
+
+## Suppliers - supplier by id [/supplier/{entity_id}]
+
+### Get [GET]
+
+Gets a supplier by its id
+
++ Parameters
+    + `entity_id` (string) - `5c516c03-2bb8-434b-9041-171eda2c5196` entity id of the supplier
+
++ Request
+
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 5c516c03-2bb8-434b-9041-171eda2c5196
+
++ Response 200 (application/json)
+
+        {
+            "website": "www.spirits.com",
+            "zip": "600001",
+            "name": "United Spirits",
+            "state": "karnataka",
+            "city": "banglore",
+            "main_contact_id": "ad51d5ac-17bb-4240-8648-c483b224b2aa",
+            "user_id": "5d081df871deea0dd14ce63a",
+            "street1": "MG Road",
+            "street2": "india",
+            "users": [],
+            "phone": "1234567890",
+            "entity_id": "5c516c03-2bb8-434b-9041-171eda2c5196",
+            "version": "5c460f80-bc34-4931-9378-668e78757a22",
+            "changed_on": "2019-06-20T03:04:06Z"
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "Resource not found"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
+
+### Delete [DELETE]
+
+Deletes a supplier by its id
+
++ Parameters
+    + `entity_id` (string) - `5c516c03-2bb8-434b-9041-171eda2c5196` entity id of the supplier
+
++ Request
+
+    + Headers
+
+            Authorization: Bearer ABCDEF
+            x-supplier-id: 5c516c03-2bb8-434b-9041-171eda2c5196
+
++ Response 204
+
++ Response 404 (application/json)
+
+        {
+            "error": "Resource not found"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Forbidden. supplier_id is not associated with the user"
+        }
